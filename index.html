@@ -1,0 +1,1226 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MVE255 — Del C Quiz</title>
+
+<!-- Prism for Python syntax highlighting (VS Code Dark+ theme) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-vsc-dark-plus.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+<!-- KaTeX for math rendering in notes -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<style>
+  :root {
+    --bg:          #1e1e1e;
+    --bg-card:     #252526;
+    --bg-code:     #1e1e1e;
+    --bg-hover:    #2a2d2e;
+    --bg-titlebar: #323233;
+    --border:      #3c3c3c;
+    --border-strong: #4a4a4a;
+
+    --fg:          #d4d4d4;
+    --fg-muted:    #969696;
+    --fg-dim:      #6e7681;
+    --fg-bright:   #ffffff;
+
+    --accent:      #0078d4;
+    --accent-hov:  #1190e6;
+    --green:       #4ec9b0;
+    --green-soft:  rgba(78, 201, 176, 0.08);
+    --red:         #f48771;
+    --red-soft:    rgba(244, 135, 113, 0.08);
+    --yellow:      #dcdcaa;
+    --purple:      #c586c0;
+    --orange:      #ce9178;
+    --blue:        #569cd6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Subtle background gradient */
+  body {
+    background: radial-gradient(ellipse at top, #252526 0%, #1e1e1e 60%);
+  }
+
+  /* Mono font for code & filenames */
+  .mono {
+    font-family: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'SF Mono', Menlo, Consolas, monospace;
+  }
+
+  /* ──────────────────────────────────────────
+     Layout
+  ────────────────────────────────────────── */
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+  }
+
+  /* ──────────────────────────────────────────
+     Title (start screen)
+  ────────────────────────────────────────── */
+  .title {
+    margin-bottom: 28px;
+  }
+  .title h1 {
+    font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--fg-bright);
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  .title h1 .keyword { color: var(--blue); }
+  .title h1 .func    { color: var(--yellow); }
+  .title h1 .string  { color: var(--orange); }
+  .title p {
+    color: var(--fg-muted);
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  /* ──────────────────────────────────────────
+     Stats grid
+  ────────────────────────────────────────── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin: 22px 0;
+  }
+  .stat {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+  }
+  .stat .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    color: var(--green);
+    line-height: 1.1;
+  }
+  .stat .label {
+    color: var(--fg-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+
+  /* ──────────────────────────────────────────
+     Category list (start)
+  ────────────────────────────────────────── */
+  .cat-section {
+    margin: 24px 0;
+  }
+  .cat-section .label-line {
+    color: var(--fg-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .cat-section .label-line::before { content: '// '; }
+
+  .cat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .cat-card .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .cat-card .info { flex: 1; }
+  .cat-card .name {
+    color: var(--fg);
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+  .cat-card .desc {
+    color: var(--fg-muted);
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .cat-card .count {
+    color: var(--fg-muted);
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg);
+    padding: 3px 9px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  /* ──────────────────────────────────────────
+     Buttons
+  ────────────────────────────────────────── */
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    font-family: inherit;
+    font-size: 14px;
+    background: var(--bg-card);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
+  }
+  .btn .kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: rgba(255,255,255,0.07);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--fg-muted);
+    margin-left: 4px;
+  }
+  .btn.primary {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  .btn.primary:hover {
+    background: var(--accent-hov);
+    border-color: var(--accent-hov);
+  }
+  .btn.success {
+    background: #16825d;
+    color: white;
+    border-color: #16825d;
+  }
+  .btn.success:hover { background: #1a9b6f; border-color: #1a9b6f; }
+  .btn.danger {
+    background: #a1260d;
+    color: white;
+    border-color: #a1260d;
+  }
+  .btn.danger:hover { background: #c52e0e; border-color: #c52e0e; }
+  .btn.ghost {
+    background: transparent;
+  }
+
+  /* ──────────────────────────────────────────
+     Quiz screen — main card
+  ────────────────────────────────────────── */
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 0 4px;
+  }
+  .quiz-header .filename {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--fg-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .quiz-header .filename .py-icon {
+    width: 16px;
+    height: 16px;
+    background: var(--blue);
+    color: white;
+    border-radius: 3px;
+    font-size: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+  .quiz-header .progress-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.3s ease;
+  }
+
+  /* Question prompt */
+  .prompt {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--green);
+    font-size: 14px;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: var(--green-soft);
+    border-left: 3px solid var(--green);
+    border-radius: 0 4px 4px 0;
+    line-height: 1.6;
+  }
+  .prompt::before {
+    content: '# ';
+    color: var(--green);
+    opacity: 0.7;
+  }
+
+  /* Code block */
+  .code-card {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .code-card .code-header {
+    background: var(--bg-titlebar);
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--fg-muted);
+  }
+  .code-card .code-header .py-tag {
+    background: rgba(86, 156, 214, 0.2);
+    color: var(--blue);
+    padding: 1px 7px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  /* Override Prism for our look */
+  pre[class*="language-"] {
+    background: var(--bg-code) !important;
+    margin: 0 !important;
+    padding: 18px 20px !important;
+    font-size: 15px !important;
+    line-height: 2.0 !important;
+    font-family: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'SF Mono', Menlo, Consolas, monospace !important;
+    overflow-x: auto;
+    border-radius: 0;
+  }
+  pre[class*="language-"] code {
+    background: transparent !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    color: var(--fg) !important;
+    text-shadow: none !important;
+  }
+  /* Make sure Prism token colors show — they should override our base */
+  .token.comment, .token.prolog, .token.doctype, .token.cdata {
+    color: #6a9955 !important;
+    font-style: italic;
+  }
+  .token.keyword, .token.tag, .token.boolean { color: var(--blue) !important; }
+  .token.function { color: var(--yellow) !important; }
+  .token.string, .token.char, .token.attr-value, .token.regex { color: var(--orange) !important; }
+  .token.number, .token.builtin { color: #b5cea8 !important; }
+  .token.operator, .token.punctuation { color: var(--fg) !important; }
+  .token.class-name { color: #4ec9b0 !important; }
+  .token.variable, .token.constant { color: #9cdcfe !important; }
+  .token.parameter { color: #9cdcfe !important; }
+  .token.decorator { color: var(--yellow) !important; }
+
+  /* ──────────────────────────────────────────
+     Answer block
+  ────────────────────────────────────────── */
+  .answer {
+    background: var(--green-soft);
+    border-left: 3px solid var(--green);
+    padding: 18px 22px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .answer.show { display: block; }
+  .answer .arrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--fg-muted);
+    margin-bottom: 6px;
+  }
+  .answer .arrow::before { content: '>>> '; color: var(--green); }
+  .answer .main {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    color: var(--green);
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  .answer .sub {
+    color: var(--fg-muted);
+    font-size: 13px;
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+  .answer .note {
+    color: var(--fg);
+    font-size: 13px;
+    line-height: 1.65;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+  }
+  .answer .note .pipe {
+    color: var(--fg-muted);
+    margin: 0 8px;
+  }
+  .answer .note code {
+    background: rgba(255,255,255,0.06);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: var(--orange);
+  }
+
+  /* ──────────────────────────────────────────
+     Quiz footer
+  ────────────────────────────────────────── */
+  .quiz-footer {
+    margin-top: 24px;
+    padding: 10px 4px;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--fg-muted);
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+  .quiz-footer .cat-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .quiz-footer .cat-tag .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+  .quiz-footer .score .ok { color: var(--green); }
+  .quiz-footer .score .nok { color: var(--red); }
+
+  /* ──────────────────────────────────────────
+     Results
+  ────────────────────────────────────────── */
+  .result-pct {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 64px;
+    font-weight: 400;
+    color: var(--green);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .result-pct.warn { color: var(--yellow); }
+  .result-pct.bad  { color: var(--red); }
+  .result-pct .total {
+    color: var(--fg-muted);
+    font-size: 22px;
+  }
+  .result-sub {
+    color: var(--fg-muted);
+    font-size: 15px;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .cat-breakdown {
+    margin-bottom: 28px;
+  }
+  .cat-breakdown h3 {
+    color: var(--fg-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+  .cat-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .cat-row:last-child { border-bottom: none; }
+  .cat-row .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .cat-row .name {
+    flex: 1;
+    font-size: 14px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .cat-row .bar {
+    width: 120px;
+    height: 4px;
+    background: var(--bg-card);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .cat-row .bar-fill {
+    height: 100%;
+    background: var(--green);
+    transition: width 0.4s ease;
+  }
+  .cat-row .score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--fg-muted);
+    width: 50px;
+    text-align: right;
+  }
+
+  .wrong-list {
+    margin-bottom: 24px;
+  }
+  .wrong-list h3 {
+    color: var(--fg-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+  }
+  .wrong-item {
+    background: var(--red-soft);
+    border-left: 3px solid var(--red);
+    border-radius: 0 4px 4px 0;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+  }
+  .wrong-item .wq {
+    color: var(--fg);
+    font-size: 13px;
+    margin-bottom: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .wrong-item .wa {
+    color: var(--red);
+    font-size: 14px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ──────────────────────────────────────────
+     Screens
+  ────────────────────────────────────────── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    .container { padding: 24px 14px 50px; }
+    .title h1 { font-size: 22px; }
+    pre[class*="language-"] {
+      font-size: 13px !important;
+      padding: 14px 16px !important;
+      line-height: 1.9 !important;
+    }
+    .answer .main { font-size: 18px; }
+    .result-pct { font-size: 48px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ────── START SCREEN ────── -->
+  <section class="screen active" id="screen-start">
+    <div class="title">
+      <h1>
+        <span class="keyword">from</span> mve255 <span class="keyword">import</span> <span class="func">DelC</span>
+      </h1>
+      <p>Mönsterigenkänning för Del C på MVE255. 29 kort från alla 7 mönster som dyker upp på tentor. Svaret är den matematiska formeln eller uttrycket som koden räknar ut — inte vad det heter (det står i förklaringen).</p>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="cat-section">
+      <div class="label-line">De 7 typerna</div>
+      <div id="cat-list"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" id="btn-start">▶ Starta quiz</button>
+      <button class="btn" id="btn-shuffle">⇄ Slumpa: PÅ</button>
+      <button class="btn ghost" id="btn-reset" style="margin-left:auto;">⟲ Nollställ</button>
+    </div>
+  </section>
+
+  <!-- ────── QUIZ SCREEN ────── -->
+  <section class="screen" id="screen-quiz">
+    <div class="quiz-header">
+      <span class="filename">
+        <span class="py-icon">py</span>
+        <span>Python</span>
+      </span>
+      <span class="progress-text" id="progress-text">1 / 29</span>
+    </div>
+    <div class="progress-bar"><div class="fill" id="progress-fill"></div></div>
+
+    <div class="prompt" id="prompt"></div>
+
+    <div class="code-card">
+      <div class="code-header">
+        <span class="py-tag">PYTHON</span>
+      </div>
+      <pre><code class="language-python" id="code-body"></code></pre>
+    </div>
+
+    <div class="answer" id="answer">
+      <div class="arrow">Svar</div>
+      <div class="main" id="answer-main"></div>
+      <div class="sub" id="answer-sub"></div>
+      <div class="note" id="answer-note"></div>
+    </div>
+
+    <div class="actions" id="quiz-actions"></div>
+
+    <div class="quiz-footer">
+      <span class="cat-tag">
+        <span class="dot" id="footer-dot"></span>
+        <span id="footer-cat"></span>
+      </span>
+      <span class="score">
+        <span class="ok">✓ <span id="score-ok">0</span></span>
+        &nbsp;·&nbsp;
+        <span class="nok">✗ <span id="score-nok">0</span></span>
+      </span>
+    </div>
+  </section>
+
+  <!-- ────── RESULTS SCREEN ────── -->
+  <section class="screen" id="screen-results">
+    <div id="results-content"></div>
+  </section>
+
+</div>
+
+<script>
+  // ════════════════════════════════════════════════════════════════
+  // QUESTION DATA — 29 cards, pure pattern recognition
+  // ════════════════════════════════════════════════════════════════
+  const CATS = {
+    mesh:     { name: 'Mesh-räkning',      desc: 'generate_mesh_2d(n, n)',   color: '#dcdcaa' },
+    jacobi:   { name: 'Numerisk derivata', desc: 'h = 1e-6, central diff',   color: '#4ec9b0' },
+    fem:      { name: 'FEM-matris',        desc: 'assemble_matrix_2d',       color: '#f48771' },
+    newton:   { name: 'Newtons metod',     desc: 'while norm > tol',         color: '#569cd6' },
+    gradient: { name: 'Gradientmetoden',   desc: 'x ← x − α · ∇f',           color: '#c586c0' },
+    area:     { name: 'Areaberäkning',     desc: '½ · |a × b| summeras',     color: '#ce9178' },
+    polygon:  { name: 'Polygon-approx',    desc: 'cos/sin + avstånd',        color: '#b5cea8' },
+    numpy:    { name: 'NumPy-funktioner',  desc: 'det / norm / solve / dot', color: '#9cdcfe' },
+  };
+
+  const QUESTIONS = [
+    // ─── Mesh (Typ 2) ───
+    { id: 'm1', cat: 'mesh',
+      prompt: 'Vad är värdet av len(V)?',
+      code: `V, K = generate_mesh_2d(n, n)
+print(len(V))`,
+      main: '(n + 1)²', sub: 'antal noder',
+      note: 'n+1 noder per riktning på enhetskvadraten ger (n+1)² noder totalt.' },
+
+    { id: 'm2', cat: 'mesh',
+      prompt: 'Vad är värdet av len(K)?',
+      code: `V, K = generate_mesh_2d(n, n)
+print(len(K))`,
+      main: '2n²', sub: 'antal trianglar',
+      note: 'n² rutor på enhetskvadraten, varje delad i 2 trianglar med en diagonal.' },
+
+    { id: 'm3', cat: 'mesh',
+      prompt: 'Vad är värdet av len(E)?',
+      code: `V, K = generate_mesh_2d(n, n)
+E = generate_edges_2d(K)
+print(len(E))`,
+      main: '3n² + 2n', sub: 'antal kanter',
+      note: 'Horisontella: n(n+1) <span class="pipe">|</span> vertikala: n(n+1) <span class="pipe">|</span> diagonala: n² <span class="pipe">|</span> summa: 3n² + 2n.' },
+
+    { id: 'm4', cat: 'mesh',
+      prompt: 'Vad blir resultatet (för vilket n som helst)?',
+      code: `V, K = generate_mesh_2d(n, n)
+E = generate_edges_2d(K)
+y = len(V) - len(E) + len(K)
+print(y)`,
+      main: '1', sub: 'V − E + F = 1',
+      note: 'Detta kallas <strong>Eulers formel</strong> för plana trianguleringar. Gäller för varje sådan triangulering med rand, oberoende av n.' },
+
+    // ─── Numerisk derivata (Typ 1) ───
+    { id: 'j1', cat: 'jacobi',
+      prompt: 'Vad approximerar detta uttryck?',
+      code: `h = 1e-6
+y = (f(x + h) - f(x - h)) / (2*h)`,
+      main: 'f′(x)', sub: 'derivatan av f i punkten x',
+      note: 'Detta kallas <strong>central differens-approximation</strong>. Ordning O(h²), noggrannare än framåt-differens som är O(h).' },
+
+    { id: 'j2', cat: 'jacobi',
+      prompt: 'Vad bygger denna loop matematiskt?',
+      code: `h = 1e-6
+for j in range(n):
+    a = x.copy(); a[j] -= h
+    b = x.copy(); b[j] += h
+    A[:, j] = (f(b) - f(a)) / (2*h)`,
+      main: "A ≈ f′(x)", sub: 'kolumn j blir ∂f/∂xⱼ',
+      note: 'Detta kallas <strong>numerisk Jacobi-matris</strong>. Varje variabel störs separat, central differens i varje kolumn.' },
+
+    { id: 'j3', cat: 'jacobi',
+      prompt: 'Vad räknar denna rad ut?',
+      code: `J = foo(f, x)   # numerisk Jacobi
+y = np.linalg.det(J)`,
+      main: 'det(f′(x))', sub: 'determinanten av Jacobi-matrisen i x',
+      note: 'På tentan: räkna Jacobi symboliskt först, sätt in punkten, ta determinanten — snabbare än att simulera koden.' },
+
+    { id: 'j4', cat: 'jacobi',
+      prompt: 'Vilken form har Jacobi-matrisen för f: ℝⁿ → ℝᵐ?',
+      code: `# f: R^n -> R^m
+A = foo(f, x)
+print(A.shape)`,
+      main: '(m, n)', sub: 'm rader (utdata), n kolumner (indata)',
+      note: 'Element Aᵢⱼ = ∂fᵢ/∂xⱼ. Specialfall: skalär utdata (m=1) → radvektor som motsvarar gradienten.' },
+
+    // ─── FEM (Typ 3) ───
+    { id: 'f1', cat: 'fem',
+      prompt: 'Vad bygger denna kod?',
+      code: `def lhs(u, v, grad_u, grad_v, x, dx):
+    return dot(grad_u, grad_v) * dx
+
+A = assemble_matrix_2d(lhs, V, K)`,
+      main: 'Aᵢⱼ = ∫ ∇φᵢ · ∇φⱼ dx', sub: 'matrisen av skalärprodukter mellan basfunktionernas gradienter',
+      note: 'Detta kallas <strong>styvhetsmatris</strong> (eng. stiffness matrix). Används för −Δu = f och andra elliptiska problem.' },
+
+    { id: 'f2', cat: 'fem',
+      prompt: 'Vad bygger denna kod?',
+      code: `def lhs(u, v, grad_u, grad_v, x, dx):
+    return u * v * dx
+
+M = assemble_matrix_2d(lhs, V, K)`,
+      main: 'Mᵢⱼ = ∫ φᵢ · φⱼ dx', sub: 'matrisen av produkter mellan basfunktioner',
+      note: 'Detta kallas <strong>massmatris</strong> (eng. mass matrix). Används för tidsberoende problem och L²-projektioner.' },
+
+    { id: 'f3', cat: 'fem',
+      prompt: 'Vad returnerar denna funktion?',
+      code: `v, grad_v = evaluate_basis_2d(i, x, X)`,
+      main: 'φᵢ(x) och ∇φᵢ', sub: 'basfunktionen och dess gradient på triangeln X',
+      note: 'X är 2×3-matris med triangelns hörnkoordinater. i ∈ {0, 1, 2} indexerar lokal hatfunktion på triangeln.' },
+
+    { id: 'f4', cat: 'fem',
+      prompt: 'När är A[i, j] ≠ 0 i en FEM-matris?',
+      code: `# A är styvhets- eller massmatris
+A[i, j]   # icke-noll endast om...`,
+      main: 'Nod i och j delar minst en triangel', sub: 'annars är integranden noll överallt',
+      note: 'Hatfunktionen φᵢ är 0 utanför trianglar med nod i. Resulterar i en <strong>gles matris</strong> (sparse matrix).' },
+
+    { id: 'f5', cat: 'fem',
+      prompt: 'Vilken storlek har en FEM-matris för generate_mesh_2d(n, n)?',
+      code: `V, K = generate_mesh_2d(n, n)
+A = assemble_matrix_2d(lhs, V, K)
+print(A.shape)`,
+      main: '((n+1)², (n+1)²)', sub: 'kvadratisk, dimension = antal noder',
+      note: 'En rad/kolumn per nod. Antal noder = (n+1)². De flesta element är noll (gles matris).' },
+
+    // ─── Newtons metod (Typ 4) ───
+    { id: 'n1', cat: 'newton',
+      prompt: 'Vad gör denna loop?',
+      code: `while np.linalg.norm(f(x)) > 1e-15:
+    J = ...
+    x = x - np.linalg.solve(J, f(x))`,
+      main: 'Itererar x tills f(x) = 0', sub: 'slutgiltigt x är roten till f(x) = 0',
+      note: 'Detta kallas <strong>Newtons metod</strong> (iterativ rotsökning). Konvergerar lokalt kvadratiskt nära roten.' },
+
+    { id: 'n2', cat: 'newton',
+      prompt: 'Vad gör denna rad matematiskt?',
+      code: `x = x - np.linalg.solve(J, f(x))`,
+      main: 'x ← x − J⁻¹ · f(x)', sub: 'Newton-uppdateringen',
+      note: 'np.linalg.solve(J, b) löser systemet J·y = b, dvs y = J⁻¹·b. Numeriskt stabilare än inv(J) @ b.' },
+
+    { id: 'n3', cat: 'newton',
+      prompt: 'Vad räknar np.linalg.solve ut?',
+      code: `y = np.linalg.solve(A, b)`,
+      main: 'y sådan att A · y = b', sub: 'matematiskt: y = A⁻¹b',
+      note: 'Använd alltid solve() istället för inv() — det är både snabbare och numeriskt stabilare.' },
+
+    // ─── Gradientmetoden (Typ 5) ───
+    { id: 'g1', cat: 'gradient',
+      prompt: 'Vad gör denna rad matematiskt?',
+      code: `x = x - alpha * grad_f(x)`,
+      main: 'x ← x − α · ∇f(x)', sub: 'steg i motsatt riktning mot gradienten',
+      note: 'Detta kallas <strong>gradientmetoden</strong>. α är steglängden. För konvex f konvergerar iterationen mot minimum.' },
+
+    { id: 'g2', cat: 'gradient',
+      prompt: 'Vad gör denna loop?',
+      code: `for k in range(100):
+    A = foo(f, x)        # numerisk gradient
+    x = x - 0.1 * A[0, :]`,
+      main: 'Itererar x mot minimum av f', sub: 'fast antal iterationer med α = 0.1',
+      note: 'Detta kallas <strong>gradientmetoden</strong>. A[0, :] är gradienten ∇f (Jacobi för skalär f är en radvektor).' },
+
+    { id: 'g3', cat: 'gradient',
+      prompt: 'Vad konvergerar x mot för en konvex f?',
+      code: `for k in range(100):
+    x = x - alpha * grad_f(x)`,
+      main: 'argmin f', sub: 'punkten där f antar sitt minsta värde',
+      note: 'Hitta minimum analytiskt med ∇f = 0. T.ex. f(x, y) = x² + y² − 6x − 8y + 32 → ∇f = (2x−6, 2y−8) = 0 → (3, 4).' },
+
+    // ─── Areaberäkning (Typ 6) ───
+    { id: 'a1', cat: 'area',
+      prompt: 'Vad är a geometriskt?',
+      code: `a = V[k[1]] - V[k[0]]`,
+      main: 'Kantvektor från hörn 0 till hörn 1', sub: 'i triangel k',
+      note: 'V[k[i]] är koordinaten för triangelns i-te hörn. Skillnaden ger riktningsvektorn längs kanten.' },
+
+    { id: 'a2', cat: 'area',
+      prompt: 'Vad räknar denna kod ut?',
+      code: `a = V[k[1]] - V[k[0]]
+b = V[k[2]] - V[k[0]]
+c = 0.5 * abs(a[0]*b[1] - a[1]*b[0])`,
+      main: '½ · |a × b|', sub: 'arean av triangel k med kantvektorer a, b',
+      note: 'a[0]·b[1] − a[1]·b[0] är z-komponenten av 2D-kryssprodukten. Halva absolutvärdet = triangelarean.' },
+
+    { id: 'a3', cat: 'area',
+      prompt: 'Vad räknar denna loop ut?',
+      code: `s = 0.0
+for k in K:
+    a = V[k[1]] - V[k[0]]
+    b = V[k[2]] - V[k[0]]
+    s += 0.5 * abs(a[0]*b[1] - a[1]*b[0])`,
+      main: '∫_Ω dx', sub: 'totalarean av domänet Ω',
+      note: 'Summa av triangelareor över hela meshet = arean av det fysiska domänet. Räkna direkt från geometrin på tentan, t.ex. <code>V = 5*V</code> → area 25.' },
+
+    // ─── Polygon-approximation (Typ 7) ───
+    { id: 'p1', cat: 'polygon',
+      prompt: 'Vad räknar denna rad ut?',
+      code: `dist = np.sqrt((c - d)**2 + (e - f)**2)`,
+      main: '√((c−d)² + (e−f)²)', sub: 'avståndet mellan punkterna (c, e) och (d, f)',
+      note: 'Detta kallas <strong>Euklidiskt avstånd</strong> (Pythagoras sats i 2D). Byggsten för polygon-approximationer av kurvor.' },
+
+    { id: 'p2', cat: 'polygon',
+      prompt: 'Vad approximerar denna loop (när N → ∞)?',
+      code: `h = 0
+for k in range(N):
+    a = k * 2*pi / N
+    b = (k+1) * 2*pi / N
+    h += np.sqrt(
+        (A*cos(a) - A*cos(b))**2 +
+        (A*sin(a) - A*sin(b))**2
+    )`,
+      main: '2π · A', sub: 'omkretsen av en cirkel med radie A',
+      note: 'N punkter på cirkeln (A·cos t, A·sin t), summerade avstånd → cirkelomkrets. Detta kallas <strong>polygon-approximation</strong>.' },
+
+    // ─── NumPy-funktioner ───
+    { id: 'b1', cat: 'numpy',
+      prompt: 'Vad räknar denna rad ut?',
+      code: `y = np.linalg.det(A)`,
+      main: 'det(A)', sub: 'determinanten av matrisen A',
+      note: 'För 2×2: ad − bc. Determinanten är noll omm matrisen är singulär (ej inverterbar).' },
+
+    { id: 'b2', cat: 'numpy',
+      prompt: 'Vad räknar denna rad ut?',
+      code: `y = np.linalg.norm(v)`,
+      main: '√(v₁² + v₂² + ...)', sub: 'längden av vektorn v',
+      note: 'Detta kallas <strong>Euklidisk norm</strong> (L²-norm). Default. Andra normer fås med ord=1 (L¹), ord=inf (L∞), etc.' },
+
+    { id: 'b3', cat: 'numpy',
+      prompt: 'Vad räknar denna rad ut?',
+      code: `s = dot(u, v)`,
+      main: 'u₁·v₁ + u₂·v₂ + ...', sub: 'skalärprodukten u · v',
+      note: 'Vektor·vektor → skalär. Matris·matris → matrismultiplikation. Matris·vektor → vektor.' },
+
+    { id: 'b4', cat: 'numpy',
+      prompt: 'Vad räknar denna rad ut?',
+      code: `y = np.linalg.solve(A, b)`,
+      main: 'y sådan att A · y = b', sub: 'matematiskt: y = A⁻¹b',
+      note: 'Numeriskt stabilare och snabbare än <code>inv(A) @ b</code>. Använd alltid solve, aldrig inv.' },
+
+    { id: 'b5', cat: 'numpy',
+      prompt: 'Vad räknar denna rad ut?',
+      code: `y = np.trace(A)`,
+      main: 'A₀₀ + A₁₁ + A₂₂ + ...', sub: 'summan av diagonalelementen',
+      note: 'Detta kallas <strong>spår</strong> (eng. trace) av matrisen. Spår = summa av egenvärden, invariant under basbyte.' },
+  ];
+
+  // ════════════════════════════════════════════════════════════════
+  // STATE & STORAGE
+  // ════════════════════════════════════════════════════════════════
+  const STORAGE_KEY = 'mve255-delc:state-v2';
+  const HISTORY_KEY = 'mve255-delc:history-v2';
+
+  let state = {
+    queue: [],
+    idx: 0,
+    answers: {},
+    revealed: false,
+    shuffle: true,
+    practiceMode: false,
+  };
+  let history = [];
+
+  function loadState() {
+    try {
+      const s = localStorage.getItem(STORAGE_KEY);
+      if (s) {
+        const saved = JSON.parse(s);
+        if (typeof saved.shuffle === 'boolean') state.shuffle = saved.shuffle;
+      }
+    } catch (e) {}
+    try {
+      const h = localStorage.getItem(HISTORY_KEY);
+      if (h) history = JSON.parse(h);
+    } catch (e) {}
+  }
+  function savePrefs() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ shuffle: state.shuffle })); } catch(e) {}
+  }
+  function saveHistory() {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch(e) {}
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // HELPERS
+  // ════════════════════════════════════════════════════════════════
+  function showScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + name).classList.add('active');
+  }
+
+  function shuffleArr(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function highlightCode() {
+    const el = document.getElementById('code-body');
+    if (window.Prism && el) {
+      try {
+        Prism.highlightElement(el);
+      } catch (e) {
+        console.warn('Syntax highlighting failed:', e);
+      }
+    }
+  }
+
+  function renderMath(el) {
+    if (window.renderMathInElement && el) {
+      try {
+        renderMathInElement(el, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false },
+          ],
+          throwOnError: false,
+        });
+      } catch (e) {
+        console.warn('Math rendering failed:', e);
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // START SCREEN
+  // ════════════════════════════════════════════════════════════════
+  function renderStart() {
+    const best = history.length ? Math.max(...history.map(h => Math.round(h.score / h.total * 100))) : 0;
+    const perfectCount = history.filter(h => h.perfect).length;
+
+    document.getElementById('stats').innerHTML = `
+      <div class="stat">
+        <div class="num">${QUESTIONS.length}</div>
+        <div class="label">Kort</div>
+      </div>
+      <div class="stat">
+        <div class="num">${history.length}</div>
+        <div class="label">Försök</div>
+      </div>
+      <div class="stat">
+        <div class="num">${best}<span style="font-size:14px;color:var(--fg-muted)">%</span></div>
+        <div class="label">Bästa</div>
+      </div>
+      <div class="stat">
+        <div class="num">${perfectCount}</div>
+        <div class="label">Perfekta</div>
+      </div>
+    `;
+
+    document.getElementById('cat-list').innerHTML = Object.entries(CATS).map(([key, c]) => {
+      const count = QUESTIONS.filter(q => q.cat === key).length;
+      return `
+        <div class="cat-card">
+          <div class="dot" style="background:${c.color}"></div>
+          <div class="info">
+            <div class="name">${c.name}</div>
+            <div class="desc">${c.desc}</div>
+          </div>
+          <div class="count">${count}</div>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('btn-shuffle').textContent = '⇄ Slumpa: ' + (state.shuffle ? 'PÅ' : 'AV');
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // QUIZ FLOW
+  // ════════════════════════════════════════════════════════════════
+  function startQuiz(practice = false, idsToUse = null) {
+    state.practiceMode = practice;
+    state.answers = {};
+    state.idx = 0;
+    state.revealed = false;
+
+    const pool = idsToUse || QUESTIONS.map(q => q.id);
+    state.queue = state.shuffle ? shuffleArr(pool) : pool;
+
+    showScreen('quiz');
+    renderCurrentQuestion();
+  }
+
+  function renderCurrentQuestion() {
+    const qid = state.queue[state.idx];
+    const q = QUESTIONS.find(x => x.id === qid);
+    state.revealed = false;
+
+    // Header
+    document.getElementById('progress-text').textContent = `${state.idx + 1} / ${state.queue.length}`;
+    document.getElementById('progress-fill').style.width = ((state.idx) / state.queue.length * 100) + '%';
+
+    // Question
+    document.getElementById('prompt').textContent = q.prompt;
+    const codeEl = document.getElementById('code-body');
+    codeEl.textContent = q.code;
+    codeEl.className = 'language-python';
+    highlightCode();
+
+    // Answer (hidden)
+    document.getElementById('answer-main').textContent = q.main;
+    const subEl = document.getElementById('answer-sub');
+    if (q.sub) {
+      subEl.textContent = q.sub;
+      subEl.style.display = 'block';
+    } else {
+      subEl.style.display = 'none';
+    }
+    document.getElementById('answer-note').innerHTML = q.note || '';
+    document.getElementById('answer').classList.remove('show');
+
+    // Footer category
+    const cat = CATS[q.cat];
+    document.getElementById('footer-dot').style.background = cat.color;
+    document.getElementById('footer-cat').textContent = cat.name;
+    const ok = Object.values(state.answers).filter(v => v === 'right').length;
+    const nok = Object.values(state.answers).filter(v => v === 'wrong').length;
+    document.getElementById('score-ok').textContent = ok;
+    document.getElementById('score-nok').textContent = nok;
+
+    // Buttons (reveal mode)
+    document.getElementById('quiz-actions').innerHTML =
+      `<button class="btn primary" id="btn-reveal">▶ Visa svar <span class="kbd">Space</span></button>`;
+    document.getElementById('btn-reveal').addEventListener('click', revealAnswer);
+  }
+
+  function revealAnswer() {
+    state.revealed = true;
+    document.getElementById('answer').classList.add('show');
+    renderMath(document.getElementById('answer'));
+    document.getElementById('quiz-actions').innerHTML = `
+      <button class="btn danger" id="btn-wrong">✗ Fel <span class="kbd">F</span></button>
+      <button class="btn success" id="btn-right">✓ Rätt <span class="kbd">R</span></button>
+    `;
+    document.getElementById('btn-right').addEventListener('click', () => markAnswer('right'));
+    document.getElementById('btn-wrong').addEventListener('click', () => markAnswer('wrong'));
+  }
+
+  function markAnswer(result) {
+    const qid = state.queue[state.idx];
+    state.answers[qid] = result;
+    state.idx++;
+    if (state.idx >= state.queue.length) finishQuiz();
+    else renderCurrentQuestion();
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // RESULTS
+  // ════════════════════════════════════════════════════════════════
+  function finishQuiz() {
+    const total = state.queue.length;
+    const correct = Object.values(state.answers).filter(v => v === 'right').length;
+    const wrongIds = state.queue.filter(qid => state.answers[qid] === 'wrong');
+    const pct = Math.round(correct / total * 100);
+    const perfect = correct === total;
+
+    history.push({
+      date: new Date().toISOString(),
+      score: correct, total: total,
+      perfect: perfect, practice: state.practiceMode,
+    });
+    saveHistory();
+
+    const cats = {};
+    state.queue.forEach(qid => {
+      const q = QUESTIONS.find(x => x.id === qid);
+      if (!cats[q.cat]) cats[q.cat] = { total: 0, right: 0 };
+      cats[q.cat].total++;
+      if (state.answers[qid] === 'right') cats[q.cat].right++;
+    });
+
+    let pctClass = '';
+    if (pct < 60) pctClass = 'bad';
+    else if (pct < 85) pctClass = 'warn';
+
+    let html = `
+      <div class="result-pct ${pctClass}">${pct}%<span class="total">  (${correct}/${total})</span></div>
+      <div class="result-sub">${
+        perfect ? 'Perfekt körning. Mönstren sitter — alla 9 Del C-poäng på tentan är dina.' :
+        pct >= 85 ? 'Riktigt bra. Repetera felen så är du på 100%.' :
+        pct >= 60 ? 'Grunden finns. Mer repetition på det som missades.' :
+                    'Tidigt in i materialet — kör en runda till.'
+      }</div>
+    `;
+
+    // Categories
+    html += `<div class="cat-breakdown"><h3>// Per kategori</h3>`;
+    Object.entries(cats).forEach(([key, d]) => {
+      const c = CATS[key];
+      const catPct = d.right / d.total * 100;
+      const barColor = catPct === 100 ? 'var(--green)' : catPct >= 50 ? 'var(--yellow)' : 'var(--red)';
+      html += `
+        <div class="cat-row">
+          <span class="dot" style="background:${c.color}"></span>
+          <span class="name">${c.name}</span>
+          <div class="bar"><div class="bar-fill" style="width:${catPct}%; background:${barColor};"></div></div>
+          <span class="score">${d.right}/${d.total}</span>
+        </div>
+      `;
+    });
+    html += `</div>`;
+
+    if (wrongIds.length > 0) {
+      html += `<div class="wrong-list"><h3>// Kort att repetera (${wrongIds.length})</h3>`;
+      wrongIds.forEach(qid => {
+        const q = QUESTIONS.find(x => x.id === qid);
+        html += `
+          <div class="wrong-item">
+            <div class="wq"># ${q.prompt}</div>
+            <div class="wa">→ ${q.main}</div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+    }
+
+    html += `<div class="actions">`;
+    if (wrongIds.length > 0) {
+      html += `<button class="btn primary" id="btn-retry">▶ Repetera felen (${wrongIds.length})</button>`;
+    }
+    html += `<button class="btn" id="btn-restart">⟲ Från början</button>`;
+    html += `<button class="btn ghost" id="btn-home" style="margin-left:auto;">⌂ Till start</button>`;
+    html += `</div>`;
+
+    document.getElementById('results-content').innerHTML = html;
+    showScreen('results');
+    renderMath(document.getElementById('results-content'));
+
+    if (wrongIds.length > 0) {
+      document.getElementById('btn-retry').addEventListener('click', () => startQuiz(true, wrongIds));
+    }
+    document.getElementById('btn-restart').addEventListener('click', () => startQuiz(false));
+    document.getElementById('btn-home').addEventListener('click', () => {
+      renderStart();
+      showScreen('start');
+    });
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  // EVENTS & INIT
+  // ════════════════════════════════════════════════════════════════
+  function setupEvents() {
+    document.getElementById('btn-start').addEventListener('click', () => startQuiz(false));
+    document.getElementById('btn-shuffle').addEventListener('click', () => {
+      state.shuffle = !state.shuffle;
+      document.getElementById('btn-shuffle').textContent = '⇄ Slumpa: ' + (state.shuffle ? 'PÅ' : 'AV');
+      savePrefs();
+    });
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      if (confirm('Nollställ all historik? Detta kan inte ångras.')) {
+        history = [];
+        saveHistory();
+        renderStart();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (document.getElementById('screen-quiz').classList.contains('active')) {
+        if (e.code === 'Space' && !state.revealed) {
+          e.preventDefault();
+          revealAnswer();
+        } else if (state.revealed) {
+          if (e.key === 'r' || e.key === 'R') markAnswer('right');
+          else if (e.key === 'f' || e.key === 'F') markAnswer('wrong');
+        }
+      }
+    });
+  }
+
+  window.addEventListener('load', () => {
+    loadState();
+    setupEvents();
+    renderStart();
+  });
+</script>
+</body>
+</html>
